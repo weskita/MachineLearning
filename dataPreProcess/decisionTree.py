@@ -38,6 +38,24 @@ def discreteIntoBase4(vector):
 	for num in vector:
 		retVector.append(int(round(num / sectionSize)))		
 	return retVector
+	
+def chooseBestFeatureToSplit(dataSet):
+	numFeatures = len(dataSet[0]) - 1
+	baseEntropy = getShannonEnt(dataSet)
+	bestInfoGain = 0.0; bestFeature = -1
+	for i in range(numFeatures):
+		featList = [example[i] for example in dataSet]
+		uniqueVals = set(featList)   #de-duplicate value range in value domain
+		newEntropy = 0.0
+		for value in uniqueVals:
+			subDataSet = splitDataSet(dataSet, i, value)
+			prob = len(subDataSet)/float(len(dataSet))
+			newEntropy += prob * getShannonEnt(subDataSet)
+		infoGain = baseEntropy - newEntropy
+		if(infoGain > bestInfoGain):
+			bestInfoGain = infoGain
+			bestFeature = id
+	return bestFeature
 
 	
 [features,markVec] = readData('foodData.csv', True, True)
