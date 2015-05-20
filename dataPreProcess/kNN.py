@@ -1,3 +1,5 @@
+#Pro. Very simple.
+#Con. Sensitive to data distribution. Large computation work.
 from numpy import *
 import operator
 
