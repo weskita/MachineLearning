@@ -14,6 +14,9 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
+#text8 corpus
+*text8*
+
 # =========================
 # Operating System Files
 # =========================
