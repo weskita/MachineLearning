@@ -87,6 +87,17 @@ def createTree(dataSet,labels):
 		subLabels = labels[:]
 		myTree[bestFeatLabel][value] = createTree(splitDataSet(dataSet,bestFeat,value),subLabels)
 	return myTree
+	
+def storeTree(inputTree,filename):
+	import pickle
+	fw = open(filename,'w')
+	pickle.dump(inputTree,fw)
+	fw.close()
+	
+def grabTree(filename):
+	import pickle
+	fr = open(filename,'r')
+	return pickle.load(fr)
 
 	
 [features,markVec] = readData('foodData.csv', True, True)
