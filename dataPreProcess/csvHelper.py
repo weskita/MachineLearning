@@ -1,6 +1,49 @@
 import csv
 import string
 import numpy
+import random
+class DataSet:
+	featVecs = []
+	labels = []
+	featMatrix = None
+	def __init__(self,featVecs,labels):
+		self.featVecs = featVecs
+		self.labels = labels
+		self.featMatrix = numpy.array(featVecs)
+		
+	def splitDataSet(self,trainSetPart,testSetPart):
+		cyclePart = trainSetPart + testSetPart
+		totalRecord = len(self.featVecs)
+	
+		trainVecs = []
+		trainLabels = []
+		testVecs = []
+		testLabels = []
+	
+		#we take the random split in totalPart size.
+		iterTimes = totalRecord/cyclePart
+		residualNum = totalRecord % cyclePart
+		for i in range(iterTimes):
+			offset = i * cyclePart
+			shuffledIndex = range(offset,offset + cyclePart)
+			random.shuffle(shuffledIndex)
+			for j in range(trainSetPart):
+				trainVecs.append(self.featVecs[shuffledIndex[j]])
+				trainLabels.append(self.labels[shuffledIndex[j]])
+			for j in range(trainSetPart,cyclePart):
+				testVecs.append(self.featVecs[shuffledIndex[j]])
+				testLabels.append(self.labels[shuffledIndex[j]])
+				
+		for i in range(-residualNum-1,-1):
+			trainVecs.append(self.featVecs[shuffledIndex[i]])
+			trainLabels.append(self.labels[shuffledIndex[i]])
+		#print trainVecs
+		#print testVecs
+		trainSet = DataSet(trainVecs,trainLabels)
+		testSet = DataSet(testVecs,testLabels)
+	
+		return trainSet,testSet
+
 def matrix2csv(lines,csv_file_path,title_line):
 	writer = csv.writer(file(csv_file_path, 'wb'))
 	writer.writerow(title_line)	
@@ -11,7 +54,7 @@ def csv2matrix(csv_file_path, has_title_line, has_line_header):
 	reader = csv.reader(file(csv_file_path, 'rb'))
 	rawMatrix = []
 	start_offset = 1 if has_line_header else 0
-	passed_first_line = False
+	passed_first_line = False	
 	
 	for line in reader:
 		if(has_title_line and not passed_first_line):
@@ -25,8 +68,7 @@ def csv2matrix(csv_file_path, has_title_line, has_line_header):
 def strVec2Numvec(strVec):
 	res = []
 	for item in strVec:
-		res.append(string.atof(item))
-	#print res
+		res.append(string.atof(item))	
 	return res	
 	
 def readData(filePath, hasTitleLine, hasLineHeader):	
@@ -38,7 +80,7 @@ def readData(filePath, hasTitleLine, hasLineHeader):
 	for item in strSet:
 		featVecs.append(strVec2Numvec(item))
 	markVec = strMatrix[:,size[1] - 1]
-	return [featVecs,markVec]
+	return DataSet(featVecs,markVec)
 	
 # Union the features vectors and mark vector into a matrix
 def createDataSet(featVecs,markVec):
@@ -47,10 +89,20 @@ def createDataSet(featVecs,markVec):
 	print featVecs[i]	
 	for mark in markVec:		
 		featVecs[i].append(mark)		
-		#print featVecs[i]
 		res.append(featVecs[i])
 		i+=1
 	return res
-		
-#matrix2csv([[1,2,3],[4,5,6],[0,7,9]],"mycsv.csv",['a','b','c'])
-#print csv2matrix("mycsv.csv",True,True)
+	
+
+
+def _main():	
+	matrix2csv([[1,2,3],[4,5,6],[0,7,9]],"mycsv.csv",['a','b','c'])
+	print csv2matrix("mycsv.csv",True,True)
+
+	totalDataSet = readData("lenses.csv",False,True)
+
+	trainSet,testSet = totalDataSet.splitDataSet(9,1)
+	print trainSet.featMatrix
+	print testSet.featMatrix
+	
+#_main()

@@ -78,5 +78,5 @@ pWC,pC = trainNB(testMatrix,['a','b','d','a'])
 #print pWC
 #print pC
 
-print classifyNB([1,0,1,0],pWC,pC)
+print classifyNB([0,1,0,2],pWC,pC)
 #print getSetList(array(['a', 'a', 'b','c','a','d']).tolist())
