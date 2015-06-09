@@ -19,18 +19,19 @@ class LinearRegressionHelper:
 			weights[j,j] = exp(diffMat*diffMat.T/(-2.0*k**2))
 			
 		xTx = xMat.T * (weights * xMat)
-		if linalg.det(xTx) == 0.0:
-			print "Matrix singular, cannot do inverse."
-			return
-		ws = xTx.I * (xMat.T * (weights * yMat))
-		return ws
+		xTy = xMat.T * (weights * yMat)		
+		try:
+			ws = linalg.solve(xTx,xTy)
+		except linalg.LinAlgError:
+			print "Meet LinAlgError('Singular matrix')"
+		return testPoint * ws
 	@staticmethod
 	def continual_lwlr(testArr,xArr, yArr, k=1.0):		
 		m = shape(testArr)[0]
 		yHat = zeros(m)
-		for i in range(m):
-			yHat[i] = lwlr(testArr[i],xArr,yArr,k)
-		
+		for i in range(m):			
+			yHat[i] = LinearRegressionHelper.lwlr(testArr[i],xArr,yArr,k)	
+			#print yHat[i]
 		return yHat
 
 def plot(xMat,yVec,ws):
@@ -40,16 +41,18 @@ def plot(xMat,yVec,ws):
 	
 def plotBrokenLine(xMat,yVec,yHat):
 	plt = plotter()
-	
+	plt.plotBrokenLinesScatter(xMat,yVec,yHat)
 
 def _main():
-	featVec = mat([[1,0,1],[1,1,0],[1,0,0]])
-	yVec = mat([3,6,1])	 
+	featVec = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
+	yVec = mat([3,6,1,21,39,32])	 
 	ws = LinearRegressionHelper.standardRegress(featVec,yVec)
-	print ws
+	#print ws
 	plot(featVec,yVec,ws)
-	
+	yHat = LinearRegressionHelper.continual_lwlr(featVec,featVec,yVec,1)
 	#print featVec,mat(yVec).T
+	#print yHat
+	plotBrokenLine(featVec,yVec,yHat)
 	
 _main()
 	

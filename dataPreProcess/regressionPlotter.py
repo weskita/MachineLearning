@@ -41,18 +41,22 @@ class LinearPlotter:
 		if ax == None:
 			ax = self.getSubplot()
 		srtInd = xMat[:,1].argsort(0)    #return the sorted indexes
-		print srtInd
+		#print srtInd
+		#print yHat
+		#print xMat
 		xSort = xMat[srtInd][:,0,:]
-		ySort = yHat[srtInd][:,0,:]
+		ySort = mat(yHat.T[srtInd][:,0])
+		print xSort
 		print ySort
-		ax.plot(xSort[:,1],ySort.T)		
+		ax.plot(xSort[:,1].flatten().A[0],ySort.flatten().A[0])
+		
 		
 	def plotBrokenLinesScatter(self,xMat,yMat,yHat,m = 1,ax = None):
 		if ax == None:
 			ax = self.getSubplot()
 		self.plotScatter(xMat,yMat,m,ax)
 		self.plotBrokenLines(xMat,yHat,m,ax)
-		return
+		plt.show()		
 		
 def _main():	
 	plotter = LinearPlotter()
@@ -62,8 +66,8 @@ def _main():
 	yHat = mat([3,6,9])
 	ws = mat([1,2])	
 	#plotter.plotLineScatter(xMat,yMat,ws,1,ax)
-	plotter.clearFigure()
-	plotter.plotBrokenLines(xMat,yHat)
+	#plotter.clearFigure()
+	plotter.plotBrokenLinesScatter(xMat,yMat,yHat)
 	
 
 _main()
