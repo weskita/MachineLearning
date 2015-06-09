@@ -16,6 +16,7 @@ $RECYCLE.BIN/
 
 #text8 corpus
 *text8*
+*.pyc
 
 # =========================
 # Operating System Files

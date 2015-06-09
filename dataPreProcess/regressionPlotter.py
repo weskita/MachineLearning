@@ -16,7 +16,8 @@ class LinearPlotter:
 		if self.fig != None:
 			self.fig.clf()
 		
-	def plotScatter(self,xMat,yMat,m,ax):		
+	def plotScatter(self,xMat,yMat,m,ax):	
+		print xMat
 		ax.scatter(xMat[:,m].flatten().A[0], yMat.T[:,0].flatten().A[0])
 
 	def plotLine(self,xMat,ws,m,ax):		
@@ -70,4 +71,4 @@ def _main():
 	plotter.plotBrokenLinesScatter(xMat,yMat,yHat)
 	
 
-_main()
+#_main()

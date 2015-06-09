@@ -1,6 +1,6 @@
 from numpy import *
 from regressionPlotter import LinearPlotter as plotter
-
+from txtTabSeperateHelper import *
 class LinearRegressionHelper: 
 	@staticmethod
 	def standardRegress(xArr, yArr):
@@ -42,8 +42,9 @@ def plot(xMat,yVec,ws):
 def plotBrokenLine(xMat,yVec,yHat):
 	plt = plotter()
 	plt.plotBrokenLinesScatter(xMat,yVec,yHat)
+	
 
-def _main():
+def __test0():
 	featVec = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
 	yVec = mat([3,6,1,21,39,32])	 
 	ws = LinearRegressionHelper.standardRegress(featVec,yVec)
@@ -53,6 +54,15 @@ def _main():
 	#print featVec,mat(yVec).T
 	#print yHat
 	plotBrokenLine(featVec,yVec,yHat)
+
+def _main():	
+	xData,yData = loadData('ex0.txt')
+	xMat = mat(xData)
+	yMat = mat(yData)
+	#ws = LinearRegressionHelper.standardRegress(xMat,yMat)	
+	#plot(xMat,yMat,ws)
+	yHat = LinearRegressionHelper.continual_lwlr(xMat,xMat,yMat,0.01)	
+	plotBrokenLine(xMat,yMat,yHat)
 	
 _main()
 	
