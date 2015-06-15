@@ -4,8 +4,8 @@
 #con. Bias to intenser samples, since they can bring more information gain.
 #		Time-cost to train, time-efficient to use.
 from math import log
-from csvHelper import *
-import numpy
+from dataloader.csvHelper import *
+import operator
 
 #getShannonEnt(): parameter: dataSet, the last colume is mark vector; the other columes of this matrix are feature vectors.
 def getShannonEnt(dataSet):
@@ -99,17 +99,20 @@ def grabTree(filename):
 	fr = open(filename,'r')
 	return pickle.load(fr)
 
+def _main():	
+	dataset = readData('../../data/foodData.csv', True, True)
+	[features,markVec] = [dataset.featVecs,dataset.labels]
+	discreteFeats = []
+	for feat in features:
+		discreteFeats.append(discreteIntoBase4(feat))
 	
-[features,markVec] = readData('foodData.csv', True, True)
-discreteFeats = []
-for feat in features:
-	discreteFeats.append(discreteIntoBase4(feat))
-	
-dataSet = createDataSet(discreteFeats,markVec)
+	dataSet = createDataSet(discreteFeats,markVec)
 
-#print dataSet
-print splitDataSet(dataSet,0,1)
-#print discreteFeats
-#print markVec
+	#print dataSet
+	print splitDataSet(dataSet,0,1)
+	#print discreteFeats
+	#print markVec
+	
+_main()
 
 	

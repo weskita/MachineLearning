@@ -1,4 +1,4 @@
-from numpy import *
+#from numpy import *
 #load data from tab seperated text files.
 #The last colume is the dependent variable, called label, return labelMat
 #The other columes are the independent variable, called features, returned dataMat. 

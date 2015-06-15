@@ -1,7 +1,7 @@
 #Pro. Very simple.
 #Con. Sensitive to data distribution. Large computation work.
-import csvHelper
-from numpy import *
+from dataloader import csvHelper
+from numpy import tile
 import operator
 
 #classify a vector inX with a train set dataSet with labels, get the top-k to judge
@@ -32,7 +32,7 @@ def assertClassifyRight(classifyRes,testLable):
 
 def _main():
 	#print classify0([1,2,3],array([[0,9,8],[4,7,8],[4,7,6]]), ['a','b','a'],2)
-	totalDataSet = csvHelper.readData("lenses.csv",False,True)
+	totalDataSet = csvHelper.readData("../../data/lenses.csv",False,True)
 	trainSet,testSet = totalDataSet.splitDataSet(9,1)
 	res = classify0(testSet.featVecs[0],trainSet.featMatrix,trainSet.labels,3)	
 	assertClassifyRight(res,testSet.labels[0])

@@ -1,6 +1,6 @@
 from numpy import *
-from regressionPlotter import LinearPlotter as plotter
-from txtTabSeperateHelper import *
+from plotter.regressionPlotter import LinearPlotter as plotter
+from dataloader.txtTabSeperateHelper import *
 class LinearRegressionHelper: 
 	@staticmethod
 	def standardRegress(xArr, yArr):
@@ -61,7 +61,7 @@ class LinearRegressionHelper:
 	def stageWiseRegress(xArr,yArr,eps = 0.01, numIt = 100):
 		xMat = mat(xArr)
 		yMat = mat(yArr).T
-		yMat = yMat - yMean
+		yMat = yMat - mean(yMat)
 		xMat = regularize(xMat)
 		m,n = shape(xMat)
 		returnMat = zeros((numIt,n))

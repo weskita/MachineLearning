@@ -96,12 +96,13 @@ def createDataSet(featVecs,markVec):
 
 
 def _main():	
-	matrix2csv([[1,2,3],[4,5,6],[0,7,9]],"mycsv.csv",['a','b','c'])
-	print csv2matrix("mycsv.csv",True,True)
+	matrix2csv([[1,2,3],[4,5,6],[0,7,9]],"../../data/mycsv.csv",['a','b','c'])
+	print csv2matrix("../../data/mycsv.csv",True,True)
 
-	totalDataSet = readData("lenses.csv",False,True)
-
+	totalDataSet = readData("../../data/lenses.csv",False,True)
+	dataSet2 = readData('../../data/foodData.csv', True, True)
 	trainSet,testSet = totalDataSet.splitDataSet(9,1)
+	print dataSet2
 	print trainSet.featMatrix
 	print testSet.featMatrix
 	
