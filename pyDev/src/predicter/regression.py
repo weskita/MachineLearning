@@ -35,10 +35,10 @@ class LinearRegressionHelper:
 		return yHat
 		
 	@staticmethod
-	def __normalizeFeature__(featVec):
+	def __regularizeFeature__(featVec):
 		featMat = mat(featVec)
 		featMeans = mean(featMat)
-		featStdVar = std(featMat)
+		featStdVar = var(featMat)
 		res = (featMat - featMeans)/featStdVar
 		return res
 		
@@ -46,7 +46,7 @@ class LinearRegressionHelper:
 	def ridgeRegress(xArr,yArr,lam = 0.2):
 		xMat = mat(xArr)
 		yMat = mat(yArr)
-		xNorm = LinearRegressionHelper.__normalizeFeature__(xMat)		
+		xNorm = LinearRegressionHelper.__regularizeFeature__(xMat)		
 		yNorm = (yMat - mean(yMat)).T   #translate y vector from raw vector to colume vector
 		
 		xTx = xNorm.T * xNorm
@@ -56,26 +56,30 @@ class LinearRegressionHelper:
 			return
 		ws = denom.I * (xNorm.T * yNorm)			
 		return ws
-		
+	@staticmethod
+	def __rssError__(yArr,yHatArr): #yArr and yHatArr both need to be arrays
+		return ((yArr-yHatArr)**2).sum()	
+
 	@staticmethod
 	def stageWiseRegress(xArr,yArr,eps = 0.01, numIt = 100):
 		xMat = mat(xArr)
 		yMat = mat(yArr).T
 		yMat = yMat - mean(yMat)
-		xMat = regularize(xMat)
+		xMat = LinearRegressionHelper.__regularizeFeature__(xMat)
 		m,n = shape(xMat)
 		returnMat = zeros((numIt,n))
 		ws = zeros((n,1))
 		wsTest = ws.copy()
 		wsMax = ws.copy()
 		for i in range(numIt):
-			print ws.T
+			#print ws.T
 			lowestError = inf
 			for j in range(n):
 				for sign in [-1,1]:
 					wsTest = ws.copy()
 					wsTest[j] += eps*sign
-					rssE = rssError(yMat.A,yTest.A)
+					yTest = xMat * wsTest
+					rssE = LinearRegressionHelper.__rssError__(yMat.A,yTest.A)
 					if rssE < lowestError:
 						lowestError = rssE
 						wsMax = wsTest
@@ -86,7 +90,6 @@ class LinearRegressionHelper:
 
 def plot(xMat,yVec,ws):
 	plt = plotter()
-	#ax = plt.getSubplot()
 	plt.plotLineScatter(xMat,yVec,ws.T)
 	
 def plotBrokenLine(xMat,yVec,yHat):
@@ -97,30 +100,39 @@ def plotBrokenLine(xMat,yVec,yHat):
 def __testStdRegression():
 	featVec = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
 	yVec = mat([3,6,1,21,39,32])	 
-	ws = LinearRegressionHelper.standardRegress(featVec,yVec)
-	#print ws
+	ws = LinearRegressionHelper.standardRegress(featVec,yVec)	
 	plot(featVec,yVec,ws)
 	
 def __testLwlrRegression():
-	xData,yData = loadData('ex0.txt')
+	xData,yData = loadLabeledData('../../data/ex0.txt')
 	xMat = mat(xData)
-	yMat = mat(yData)
-	#ws = LinearRegressionHelper.standardRegress(xMat,yMat)	
-	#plot(xMat,yMat,ws)
+	yMat = mat(yData)	
 	yHat = LinearRegressionHelper.continual_lwlr(xMat,xMat,yMat,0.01)	
 	plotBrokenLine(xMat,yMat,yHat)
-	
+def __testRidgeRegress():
+	xData,yData = loadLabeledData('../../data/ex0.txt')
+	#xData = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
+	#yData = mat([3,6,1,21,39,32])
+	xMat = LinearRegressionHelper.__regularizeFeature__(xData)
+	yMat = mat(yData)	
+	ws = LinearRegressionHelper.ridgeRegress(xMat,yMat,0.3)	
+	plot(xMat,yMat,ws)
+	return	
+
+def __testStageWiseRegress():
+	xData,yData = loadLabeledData('../../data/ex0.txt')
+	#xData = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
+	#yData = mat([3,6,1,21,39,32])
+	xMat = LinearRegressionHelper.__regularizeFeature__(xData)
+	yMat = LinearRegressionHelper.__regularizeFeature__(yData)	
+	wsIters = LinearRegressionHelper.stageWiseRegress(xMat, yMat)	
+	wsLast = mat(wsIters[-1,:])
+	plot(xMat,yMat,wsLast.T)
+	return	
 
 def _main():	
-	#xData,yData = loadData('ex0.txt')
-	xData = mat([[1,0,1],[1,1,0],[1,0,0],[1,2,6],[1,4,9],[1,6,3]])
-	yData = mat([3,6,1,21,39,32])
-	xMat = mat(xData)
-	yMat = mat(yData)
-	#ws = LinearRegressionHelper.standardRegress(xMat,yMat)	
-	#plot(xMat,yMat,ws)
-	ws = LinearRegressionHelper.ridgeRegress(xMat,yMat,0.01)	
-	plot(xMat,yMat,ws)
+	#__testRidgeRegress()
+	__testStageWiseRegress()
 	
 _main()
 	

@@ -16,18 +16,15 @@ class LinearPlotter:
 		if self.fig != None:
 			self.fig.clf()
 		
-	def plotScatter(self,xMat,yMat,m,ax):	
-		print xMat
+	def plotScatter(self,xMat,yMat,m,ax):			
 		ax.scatter(xMat[:,m].flatten().A[0], yMat.T[:,0].flatten().A[0])
 
 	def plotLine(self,xMat,ws,m,ax):		
 		xLocal = xMat.copy()
 		xLocal.sort(0)
-		yHat = xLocal * ws.T
-		#print xLocal[:,m],yHat
+		yHat = xLocal * ws.T		
 		ax.plot(xLocal[:,m],yHat)
 	
-	#plot scatter (xMat(:,m),yMat) and line (xMat(:,m),ws) on screen 
 	def plotLineScatter(self,xMat,yMat,ws,m = 1,ax = None):
 		# 0 is the subscript for const item, it should be 1.
 		if m <= 0:
@@ -41,14 +38,9 @@ class LinearPlotter:
 	def plotBrokenLines(self,xMat,yHat,m = 1,ax = None):
 		if ax == None:
 			ax = self.getSubplot()
-		srtInd = xMat[:,1].argsort(0)    #return the sorted indexes
-		#print srtInd
-		#print yHat
-		#print xMat
+		srtInd = xMat[:,1].argsort(0)    #return the sorted indexes		
 		xSort = xMat[srtInd][:,0,:]
-		ySort = mat(yHat.T[srtInd][:,0])
-		print xSort
-		print ySort
+		ySort = mat(yHat.T[srtInd][:,0])		
 		ax.plot(xSort[:,1].flatten().A[0],ySort.flatten().A[0])
 		
 		
