@@ -1,18 +1,27 @@
+#coding: utf8
 '''
-Created on 2015Äê6ÔÂ16ÈÕ
+Created on 2015ï¿½ï¿½6ï¿½ï¿½16ï¿½ï¿½
 
 @author: Sean Zhao
 '''
 from numpy import *
-from scimath.units.plugin.new_scalar_wizard import NewScalarWizard
+from dataloader.txtTabSeperateHelper import loadNumData
 
 #default split point: the mean value of last feature.
 def regLeaf(dataSet):
     return mean(dataSet[:,-1])
 
-def regErr():
-    return None
+def regErr(dataSet):
+    return var(dataSet[:,-1]) * shape(dataSet)[0]
 
+def regTreeEval(model, inDat):
+    return float(model)
+
+def modelTreeEval(model, inDat):
+    n = shape(inDat)[1]
+    X = mat(ones((1,n+1)))
+    X[:,1:n+1]=inDat
+    return float(X*model)
 
 class treeNode:
     def __init__(self,feat,val,right,left):
@@ -24,12 +33,14 @@ class treeNode:
 class CART:
     @staticmethod
     def binSplitDataSet(dataSet,featCol,value):
-        mat0 = dataSet[nonzero(dataSet[:,featCol] > value)[0],:]
-        mat1 = dataSet[nonzero(dataSet[:,featCol] <= value)[0],:]
+        mat0 = dataSet[nonzero(dataSet[:,featCol] > value)[0],:][0]
+        mat1 = dataSet[nonzero(dataSet[:,featCol] <= value)[0],:][0]
         return mat0,mat1
+    
     @staticmethod
     def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
         feat,val = CART.chooseBestSplit(dataSet, leafType, errType, ops)
+        print feat
         #return only value when meeting stop condition.
         if feat == None: return val
         
@@ -37,13 +48,15 @@ class CART:
         retTree['spInd'] = feat
         retTree['spVal'] = val
         lSet, rSet = CART.binSplitDataSet(dataSet,feat,val)
+        
         retTree['left'] = CART.createTree(lSet, leafType, errType, ops)
         retTree['right'] = CART.createTree(rSet, leafType, errType, ops)
         return retTree
+    
     @staticmethod
-    def chooseBestSplit(dataSet, leafType, errType, ops):        
+    def chooseBestSplit(dataSet, leafType=regLeaf, errType = regErr, ops=(1,4)):        
         tolS = ops[0]; tolN = ops[1]
-        if len(set(dataSet[:,-1]).T.tolist()[0]) == 1:
+        if len(set(dataSet[:,-1].T.tolist()[0])) == 1:
             return None,leafType(dataSet)
         
         m,n = shape(dataSet)
@@ -51,20 +64,41 @@ class CART:
         bestS = inf; bestIndex = 0; bestValue = 0
         for featIndex in range(n-1):
             for splitVal in set(dataSet[:,featIndex]):
-                mat0,mat1 = CART.binSplitDataSet(dataSet,bestIndex,bestValue)
+                mat0,mat1 = CART.binSplitDataSet(dataSet,featIndex,splitVal)
                 if (shape(mat0)[0] < tolN or (shape(mat1)[0] < tolN)): continue
                 newS = errType(mat0) + errType(mat1)
                 if newS < bestS:
                     bestIndex = featIndex
                     bestValue = splitVal
                     bestS = newS
-        
+        print bestIndex,bestValue
         if (S - bestS) < tolS:
             return None, leafType(dataSet)
+        
         mat0,mat1 = CART.binSplitDataSet(dataSet, bestIndex, bestValue)
         if (shape(mat0)[0] < tolN) or (shape(mat1)[0] < tolN):
             return None,leafType(dataSet)
-        
+       
         return bestIndex,bestValue
-                    
-        return None,None
+    
+    @staticmethod
+    def isTree(obj):
+        return (type(obj).__name__=='dict')
+    
+    @staticmethod
+    def getMean(tree):
+        if CART.isTree(tree['right']): tree['right'] = CART.getMean(tree['right'])
+        if CART.isTree(tree['left']): tree['left'] = CART.getMean(tree['left'])
+        return (tree['left'] + tree['right']) / 2
+    
+    @staticmethod
+    def treeForeCast(tree, inData, modelEval=regTreeEval):
+        return
+ 
+def _main():
+    myDat =  loadNumData('../../data/ex00.txt')  
+    myMat = mat(myDat)    
+    tree = CART.createTree(myMat)    
+    print tree         
+    
+_main()
