@@ -39,8 +39,7 @@ class CART:
     
     @staticmethod
     def createTree(dataSet, leafType=regLeaf, errType=regErr, ops=(1,4)):
-        feat,val = CART.chooseBestSplit(dataSet, leafType, errType, ops)
-        print feat
+        feat,val = CART.chooseBestSplit(dataSet, leafType, errType, ops)        
         #return only value when meeting stop condition.
         if feat == None: return val
         
@@ -91,6 +90,26 @@ class CART:
         if CART.isTree(tree['left']): tree['left'] = CART.getMean(tree['left'])
         return (tree['left'] + tree['right']) / 2
     
+    @staticmethod
+    def prune(tree,testData):
+        if shape(testData)[0] <= 0 : return CART.getMean(tree)
+        if (CART.isTree(tree['left']) or CART.isTree(tree['right'])) :
+            lSet, rSet = CART.binSplitDataSet(testData,tree['spInd'],tree['spVal'])
+        if CART.isTree(tree['left']): tree['left'] = CART.prune(tree['left'], lSet)
+        if CART.isTree(tree['right']): tree['right'] = CART.prune(tree['right'], rSet)
+        if not (CART.isTree(tree['left']) or CART.isTree(tree['right'])):
+            lSet,rSet = CART.binSplitDataSet(testData, tree['spInd'], tree['spVal'])
+            errorNoMerge = sum(power(lSet[:,-1] - tree['left'], 2)) + sum(power(lSet[:,-1] - tree['right'], 2)) 
+            treeMean = (tree['left'] + tree['right'] / 2.0)
+            errorMerge = sum(power(testData[:,-1] - treeMean,2))
+            if errorMerge < errorNoMerge:
+                print 'merging'
+                return treeMean
+            else:
+                return tree
+        else:
+            return tree
+        
     @staticmethod
     def treeForeCast(tree, inData, modelEval=regTreeEval):
         return
